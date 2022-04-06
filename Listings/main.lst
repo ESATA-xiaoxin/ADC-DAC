@@ -1,0 +1,140 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              04/05/2022 20:48:12 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\APP\keil5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\ma
+                    -in.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <STC15F2K60S2.h>
+   2          #include <iic.h>
+   3          
+   4          #define uchar unsigned char 
+   5          #define uint unsigned int
+   6            
+   7          uchar code dpnum[]={0xc0,0xf9,0xa4,0xb0,0x99,0x92,0x82,0xf8,0x80,0x90,0xbf,0xff};
+   8          uchar code dpdotnum[]={0x40,0x79,0x24,0x30,0x19,0x12,0x02,0x78,0x00,0x10,0x3f,0x7f};
+   9          uchar RDdat;
+  10          uint Vout;
+  11          
+  12          void System_Init();
+  13          void delayms(uchar ms);
+  14          void display_bit(uchar pos,uchar dat);
+  15          void display();
+  16          uchar PCF8591_Read(uchar add);
+  17          void PCF8591_Write(uchar add,uchar dat);
+  18          
+  19          void main()
+  20          {
+  21   1        System_Init();
+  22   1        while(1)
+  23   1        {
+  24   2          RDdat=PCF8591_Read(0x03);
+  25   2          Vout=RDdat*500.0/255;
+  26   2          PCF8591_Write(0x40,102);
+  27   2          display();
+  28   2        }
+  29   1      }
+  30          
+  31          void System_Init()
+  32          {
+  33   1        P2 = (P2 & 0x1f) | 0x80;
+  34   1        P0 = 0xff;
+  35   1        P2 = (P2 & 0x1f) | 0xa0;
+  36   1        P0 = 0x00;
+  37   1        P2 = (P2 & 0x1f) | 0xc0;
+  38   1        P0 = 0xff;
+  39   1        P2 = (P2 & 0x1f) | 0xe0;
+  40   1        P0 = 0xff;
+  41   1      }
+  42          void delayms(uchar ms)
+  43          {
+  44   1        uint i,j;
+  45   1        for(i=ms;i>0;i--)
+  46   1          for(j=810;j>0;j--);
+  47   1      }
+  48          void display_bit(uchar pos,uchar dat)
+  49          {
+  50   1        P0 = 0xff;
+  51   1        P2 = (P2 & 0x1f) | 0xc0;
+  52   1        P0 = 0x01 << pos;
+  53   1        P2 = (P2 & 0x1f) | 0xe0;
+  54   1        P0 = dat;
+C51 COMPILER V9.60.0.0   MAIN                                                              04/05/2022 20:48:12 PAGE 2   
+
+  55   1      }
+  56          void display()
+  57          {
+  58   1        display_bit(0,dpnum[11]);
+  59   1        delayms(1);
+  60   1        display_bit(1,dpnum[11]);
+  61   1        delayms(1);
+  62   1        display_bit(2,dpnum[11]);
+  63   1        delayms(1);
+  64   1        display_bit(3,dpnum[11]);
+  65   1        delayms(1);
+  66   1        display_bit(4,dpnum[11]);
+  67   1        delayms(1);
+  68   1        display_bit(5,dpdotnum[Vout/100]);
+  69   1        delayms(1);
+  70   1        display_bit(6,dpnum[Vout/10%10]);
+  71   1        delayms(1);
+  72   1        display_bit(7,dpnum[Vout%10]);
+  73   1        delayms(1);
+  74   1        P2 = (P2 & 0x1f) | 0xc0;
+  75   1        P0 = 0xff;
+  76   1        P2 = (P2 & 0x1f) | 0xe0;
+  77   1        P0 = 0xff;
+  78   1      }
+  79          uchar PCF8591_Read(uchar add)
+  80          {
+  81   1        uchar temp;
+  82   1        IIC_Start();
+  83   1        IIC_SendByte(0x90);
+  84   1        IIC_WaitAck();
+  85   1        
+  86   1        IIC_SendByte(add);
+  87   1        IIC_WaitAck();
+  88   1        IIC_Stop();
+  89   1        
+  90   1        IIC_Start();
+  91   1        IIC_SendByte(0x91);
+  92   1        IIC_WaitAck();
+  93   1        
+  94   1        temp=IIC_RecByte();
+  95   1        IIC_SendAck(1);
+  96   1        IIC_Stop();
+  97   1        
+  98   1        return temp;
+  99   1      }
+ 100          void PCF8591_Write(uchar add,uchar dat)
+ 101          {
+ 102   1        IIC_Start();
+ 103   1        IIC_SendByte(0x90);
+ 104   1        IIC_WaitAck();
+ 105   1        
+ 106   1        IIC_SendByte(add);
+ 107   1        IIC_WaitAck();
+ 108   1        
+ 109   1        IIC_SendByte(dat);
+ 110   1        IIC_WaitAck();
+ 111   1        IIC_Stop();
+ 112   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    425    ----
+C51 COMPILER V9.60.0.0   MAIN                                                              04/05/2022 20:48:12 PAGE 3   
+
+   CONSTANT SIZE    =     24    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3       4
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,4 @@
+".\Objects\main.obj",
+".\Objects\iic.obj" 
+TO ".\Objects\Rb2DAC" 
+PRINT(".\Listings\Rb2DAC.m51") RAMSIZE(256) 
